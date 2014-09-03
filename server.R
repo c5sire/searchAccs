@@ -7,10 +7,14 @@
 
 library(shiny)
 library(shinyBS)
+library(exsic)
 
 source("R/tools.R")
 
 step = 10
+
+td = tempdir()
+of = file.path(td,"out.html")
 
 shinyServer(function(input, output, session) {
   
@@ -33,6 +37,8 @@ shinyServer(function(input, output, session) {
     updateSelectInput(session, "offset", choices = 1:max, selected = p)
     
   })
+  
+  
 
   output$results <- renderUI({
     n = as.integer(res()$hits$total)
@@ -52,10 +58,14 @@ shinyServer(function(input, output, session) {
     tot = paste(tot, rcs)
     
     if(n > 0) {
-      for(i in 1:n){
+      ns = length(res()$hits$hits)
+      for(i in 1:ns){
         res = res()$hits$hits[i]
         rec = res[[1]][["_source"]]
-        out = paste(rec, collapse = ", ")
+        out = pasteSpec(rec)
+        
+        #out = index.citations(out)
+        
         tot = paste(tot, out, br(), br(), sep="")
       }
       

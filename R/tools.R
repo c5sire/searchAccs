@@ -1,6 +1,7 @@
 library(httr)
 library(rjson)
 library(stringr)
+library(shiny)
 
 step=10
 
@@ -40,4 +41,13 @@ esSearch <- function(query = NULL, url = "http://localhost", port = 9200, from =
 }
 
 
+pasteSpec <- function(rec){
+  
+  rid = paste(rec$collector, ": ", rec$number, sep="")
+  
+  paste(a(rid,href="http://www.google.com"),  " ",
+    rec$genus, " ", rec$species, ". ", rec$country, " - ", rec$colldate,
+    sep="")
+}
+  
   
