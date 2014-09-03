@@ -25,19 +25,20 @@ shinyServer(function(input, output, session) {
     input$search
     p = as.integer(input$offset)
     n = res()$hits$total
-    #print(x)
+    if(length(n)==0) n = 0
     max = 1
     if(n > step){
       max = round(n / step + 0.5, 0)
     }
-    
     updateSelectInput(session, "offset", choices = 1:max, selected = p)
+    
   })
 
   output$results <- renderUI({
     n = as.integer(res()$hits$total)
     #print(n)
     s = round(as.integer(res()$took)/1000, 2) + 1
+    if(length(n)==0) n = 0
     tot = paste("Total results:", n, " (", s, " seconds)", br())
     
     if(n>step){
