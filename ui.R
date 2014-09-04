@@ -16,13 +16,16 @@ shinyUI(fluidPage(
   # Sidebar with a slider input for number of bins
   sidebarLayout(
     sidebarPanel(
-      textInput("search", "Search", ""),
-      selectInput("offset", "Show results page:", 1)
+      textInput("search", "Search", "")
+      #,
+      #selectInput("offset", "Show results page:", 1)
     ),
 
     # Show a plot of the generated distribution
     mainPanel(
-      htmlOutput("results")
+      htmlOutput("results"),
+      htmlOutput("resultsNav")
+      
     
     )
   )

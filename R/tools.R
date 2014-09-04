@@ -3,7 +3,8 @@ library(rjson)
 library(stringr)
 library(shiny)
 
-step=10
+source("R/constants.R")
+#step=10
 
 makeQuery <- function(terms=NULL, from=0){
   if(length(terms)==0 | is.null(terms) ){
@@ -13,16 +14,25 @@ makeQuery <- function(terms=NULL, from=0){
    }
   }' 
   } else {
-    qu = '{
+    query = '{
+
       "from": _F_,
+      "size": _S_,
+      "sort": [
+              {"collector": "asc"},
+              {"number": "asc"}
+            ],
       "query": {
         "query_string": {
+          "default_operator": "AND",
           "query": "_Q_"
         }
+        
       }
     }'
-    query = str_replace(qu, "_Q_", terms)
-    query = str_replace(query, "_F_", from * step)
+    query = str_replace(query, "_Q_", terms)
+    query = str_replace(query, "_S_", step)
+    query = str_replace(query, "_F_", from)
     
   }
   
