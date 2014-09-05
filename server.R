@@ -62,7 +62,7 @@ shinyServer(function(input, output, session) {
     sp = selPage()
     #print(sp)
     #print(n)
-    s = round(as.integer(res()$took)/1000, 2) + 1
+    s = round(as.integer(res()$took)/1000, 2) 
     if(length(n)==0) n = 0
     tot = paste("Total results:", n, " (", s, " seconds)", br())
     

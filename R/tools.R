@@ -55,7 +55,7 @@ pasteSpec <- function(rec){
   
   rid = paste(rec$collector, ": ", rec$number, sep="")
   
-  paste(a(rid,href="http://www.google.com"),  " ",
+  paste(a(rid,href="profiles/profile.html"),  " ",
     rec$genus, " ", rec$species, ". ", rec$country, " - ", rec$colldate,
     sep="")
 }
