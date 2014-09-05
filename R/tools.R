@@ -6,7 +6,7 @@ library(shiny)
 source("R/constants.R")
 #step=10
 
-makeQuery <- function(terms=NULL, from=0){
+makeQuery <- function(terms=NULL, from=0, step=10, oper="AND"){
   if(length(terms)==0 | is.null(terms) ){
     query = '{
    "query": {
@@ -24,7 +24,7 @@ makeQuery <- function(terms=NULL, from=0){
             ],
       "query": {
         "query_string": {
-          "default_operator": "AND",
+          "default_operator": "_O_",
           "query": "_Q_"
         }
         
@@ -32,6 +32,7 @@ makeQuery <- function(terms=NULL, from=0){
     }'
     query = str_replace(query, "_Q_", terms)
     query = str_replace(query, "_S_", step)
+    query = str_replace(query, "_O_", oper)
     query = str_replace(query, "_F_", from)
     
   }
@@ -40,11 +41,17 @@ makeQuery <- function(terms=NULL, from=0){
 }
 
 
-esSearch <- function(query = NULL, url = "http://localhost", port = 9200, from = 0){
+esSearch <- function(query = NULL, 
+                     url = "http://localhost", 
+                     port = 9200, 
+                     from = 0,
+                     step = 10,
+                     oper = "AND"
+                     ){
   url = paste(url, port, sep=":")
   url = paste(url,"_search", sep="/")
   
-  query = makeQuery(query, from)
+  query = makeQuery(query, from, step, oper)
   
   x=POST(url, body = query)
   fromJSON(content(x, as="text"))

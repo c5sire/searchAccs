@@ -10,7 +10,7 @@ library(shinyBS)
 library(exsic)
 
 source("R/tools.R")
-source("R/constants.R")
+#source("R/constants.R")
 
 td = tempdir()
 of = file.path(td,"out.html")
@@ -18,14 +18,36 @@ of = file.path(td,"out.html")
 shinyServer(function(input, output, session) {
   
   page = reactive({
-    offset = as.integer(input$offset) - 1
+    offset = 0
+    try({
+      offset = as.integer(input$offset) - 1
+    })
+    if(length(offset)==0) offset = 0
     offset
+  })
+  
+  step = reactive({
+    step = 10
+    try({
+      step = as.integer(input$pageSize)
+    })
+    if(length(step)==0) step=10
+    step
+  })
+  
+  opr = reactive({
+    opr = "AND"
+    try({
+      opr = input$searchOperator
+    })
+    if(length(opr)==0) opr="AND"
+    opr
   })
   
   
   res = reactive({
-    res = esSearch(input$search, from = (selPage()-1) * step)
-    #print(selPage())
+    res = esSearch(input$search, from = (selPage()-1) * step(), step = step(), 
+                   oper=opr())
     res
   })
   
@@ -38,8 +60,8 @@ shinyServer(function(input, output, session) {
     #print(n)
     if(length(n)==0) n = 0
     max = 1
-    if(n > step){
-      max = round(n / step + 0.5, 0)
+    if(n > step()){
+      max = round(n / step() + 0.5, 0)
     }
     list(p=p, max=max)
   })
@@ -66,9 +88,9 @@ shinyServer(function(input, output, session) {
     if(length(n)==0) n = 0
     tot = paste("Total results:", n, " (", s, " seconds)", br())
     
-    if(n>step){
-      rcsStart = (sp - 1) * step +1
-      rcsEnd   = rcsStart + step -1
+    if(n>step()){
+      rcsStart = (sp - 1) * step() +1
+      rcsEnd   = rcsStart + step() -1
       if(rcsEnd > n) rcsEnd = n
       rcs = paste("Display records:", rcsStart, "-", rcsEnd, br(), hr())
     } else {
