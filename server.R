@@ -44,10 +44,27 @@ shinyServer(function(input, output, session) {
     opr
   })
   
+  elevOn = reactive({
+    input$filterElevation
+  })
+  
+  elev = reactive({
+    elev = c(NA, NA)
+    try({
+      elev = input$elevRange  
+    })
+    
+    elev
+  })
   
   res = reactive({
+    elev = c(NA, NA)
+    if(elevOn()) elev = elev()
+    
+    
     res = esSearch(input$search, from = (selPage()-1) * step(), step = step(), 
-                   oper=opr())
+                   oper=opr(), 
+                   elev = elev)
     res
   })
   
@@ -71,8 +88,16 @@ shinyServer(function(input, output, session) {
   observe({
     input$search
     pm = pageMax()
-    #print(pm)
-    #updateSelectInput(session, "offset", choices = 1:pm$max, selected = pm$p)
+    #print(res() )
+    cntr = res()$aggregations$cntr_stats$buckets
+    #print(length(specs))
+    cntr = matrix(unlist(cntr),2)
+    #print(xx[1,])
+    #print(class(xx))
+    xx=sort(paste(cntr[1,], " (", cntr[2,],")", sep=""))
+    updateCheckboxGroupInput(session, "countrySel", label = xx, choices = cntr[2,])
+    
+    
     updateRadioButtons(session, "offset", choices = 1:pm$max, selected = pm$p)
   })
   
@@ -87,12 +112,15 @@ shinyServer(function(input, output, session) {
     s = round(as.integer(res()$took)/1000, 2) 
     if(length(n)==0) n = 0
     tot = paste("Total results:", n, " (", s, " seconds)", br())
+    if(elevOn()) tot = 
+      paste(tot, "Within elevation range: ", elev()[1], "-", elev()[2], " masl", br())
     
     if(n>step()){
       rcsStart = (sp - 1) * step() +1
       rcsEnd   = rcsStart + step() -1
       if(rcsEnd > n) rcsEnd = n
       rcs = paste("Display records:", rcsStart, "-", rcsEnd, br(), hr())
+
     } else {
       rcs = paste(hr())
     }
@@ -120,6 +148,18 @@ shinyServer(function(input, output, session) {
     HTML(hr())
     mp = pageMax()
     if(mp$max>1) radioButtons("offsetNew","Select a results page:",1:mp$max, selected = mp$p,inline=TRUE)
+  })
+  
+  output$countrySel <- renderUI({
+    cntr = res()$aggregations$cntr_stats$buckets
+    cntr = matrix(unlist(cntr),2)
+    
+    xx=sort(paste(cntr[1,], " (", cntr[2,],")", sep=""))
+    #print(xx)
+    {
+    hr()
+    checkboxGroupInput("country", "", label=xx, choices = cntr[1,])
+    }
   })
   
   selPage <- reactive({

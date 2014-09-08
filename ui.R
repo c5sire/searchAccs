@@ -16,7 +16,7 @@ shinyUI(fluidPage(
   # Sidebar with a slider input for number of bins
   sidebarLayout(
     sidebarPanel(
-      textInput("search", "Search", ""),
+      textInput("search", "Search", "*"),
       checkboxInput("more", "More search options ..."),
       
       conditionalPanel(
@@ -35,9 +35,15 @@ shinyUI(fluidPage(
       
       conditionalPanel(
         condition = "input.filterElevation == true",
-          htmlOutput("elevationSel")
-          #sliderInput("elevRange", "Elevation range", -500, 8848, c(0,4000))
+          htmlOutput("elevationSel"),
+          sliderInput("elevRange", "Elevation range", -500, 8848, c(0,4000))
+      ),
+      conditionalPanel(
+        
+        condition = "input.filterCountry == true",
+        htmlOutput("countrySel")
       )
+      
     ),
     
     
