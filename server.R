@@ -17,6 +17,8 @@ of = file.path(td,"out.html")
 
 shinyServer(function(input, output, session) {
   
+  
+  
   page = reactive({
     offset = 0
     try({
@@ -61,10 +63,10 @@ shinyServer(function(input, output, session) {
     elev = c(NA, NA)
     if(elevOn()) elev = elev()
     
-    
     res = esSearch(input$search, from = (selPage()-1) * step(), step = step(), 
                    oper=opr(), 
-                   elev = elev)
+                   elev = elev,
+                   cntr = input$countryRB)
     res
   })
   
@@ -85,22 +87,49 @@ shinyServer(function(input, output, session) {
   
   
   
+  ca   = NULL
+  
+  cntrsAll = reactive({
+    
+    cntr = res()$aggregations$cntr_stats$buckets
+    #print(cntr)
+    cntr = matrix(unlist(cntr),2)
+    z = sort(cntr[1, ])
+    #print(z)
+    ca = sort(unique(c(ca, z)))
+    print(paste("ALL:", ca))
+    ca[1:6]
+  })
+  
+#   cntrySel = reactive({
+#     cntr = res()$aggregations$cntr_stats$buckets
+#     cntr = matrix(unlist(cntr),2)
+#     
+#     xx=sort(paste(cntr[1,], " (", cntr[2,],")", sep=""))
+#     z = as.list(sort(cntr[1, ]))
+#     names(z) = xx
+#     z
+#   })
+#   
+#   cntry = reactive({
+#     z=input$countryRB
+#     z
+#   })
+  
   observe({
     input$search
     pm = pageMax()
-    #print(res() )
-    cntr = res()$aggregations$cntr_stats$buckets
-    #print(length(specs))
-    cntr = matrix(unlist(cntr),2)
-    #print(xx[1,])
-    #print(class(xx))
-    xx=sort(paste(cntr[1,], " (", cntr[2,],")", sep=""))
-    updateCheckboxGroupInput(session, "countrySel", label = xx, choices = cntr[2,])
-    
-    
     updateRadioButtons(session, "offset", choices = 1:pm$max, selected = pm$p)
+    updateCheckboxGroupInput(session, "countryRB", label="", choices = cntrsAll(),
+                             selected = input$countryRB)
   })
   
+#   observe({
+#     input$search
+#     #print(cntry())
+#     updateCheckboxGroupInput(session, "countryRB", label="", choices = cntrsAll(),
+#                               selected = input$countryRB)
+#   })
   
 
   output$results <- renderUI({
@@ -147,25 +176,31 @@ shinyServer(function(input, output, session) {
   output$resultsNav <- renderUI({
     HTML(hr())
     mp = pageMax()
-    if(mp$max>1) radioButtons("offsetNew","Select a results page:",1:mp$max, selected = mp$p,inline=TRUE)
+    if(mp$max>1) radioButtons("offsetNew","Select a results page:",1:mp$max, 
+                              selected = mp$p,inline=TRUE)
   })
   
-  output$countrySel <- renderUI({
-    cntr = res()$aggregations$cntr_stats$buckets
-    cntr = matrix(unlist(cntr),2)
-    
-    xx=sort(paste(cntr[1,], " (", cntr[2,],")", sep=""))
-    #print(xx)
-    {
-    hr()
-    checkboxGroupInput("country", "", label=xx, choices = cntr[1,])
-    }
-  })
   
   selPage <- reactive({
     x=as.integer(input$offsetNew)
     if(length(x) == 0) x=1
     x
   })
+  
+  output$countrySel <- renderUI({
+#     cntr = res()$aggregations$cntr_stats$buckets
+#     cntr = matrix(unlist(cntr),2)
+#     
+#     xx=sort(paste(cntr[1,], " (", cntr[2,],")", sep=""))
+#     z = as.list(sort(cntr[1, ]))
+#     names(z) = xx
+    
+    #print(cntrySel())
+    #print(cntry())
+    checkboxGroupInput("countryRB", "", choices=cntrsAll())
+    #checkboxGroupInput("countryRB", "", choices=cntrySel())
+    
+  })
+
 
 })

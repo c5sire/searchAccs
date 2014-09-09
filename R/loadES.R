@@ -40,7 +40,7 @@ formatES <-function(index, entry, host = "http://localhost:9200"){
             "country" : {"type" : "string", "null_value" : ""},
             "collcite" : {"type" : "string", "null_value" : ""},
             "phenology" : {"type" : "string", "null_value" : ""},
-            "elevation" : {"type" : "integer", "null_value": -9999}
+            "elevation" : {"type" : "integer", "null_value": ""}
         }
     }
  }
@@ -55,7 +55,7 @@ rec2ES <- function(rec, index, entry, nr, host = "http://localhost:9200"){
   
   body = toJSON(rec)
   
-  body = gsub('\\"NA\\"',-9999, body)
+  body = gsub('\\"NA\\"',"null", body)
   PUT(url, body=body)
 }
 

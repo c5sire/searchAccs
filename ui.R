@@ -36,12 +36,13 @@ shinyUI(fluidPage(
       conditionalPanel(
         condition = "input.filterElevation == true",
           htmlOutput("elevationSel"),
-          sliderInput("elevRange", "Elevation range", -500, 8848, c(0,4000))
+          sliderInput("elevRange", "Elevation range", 0, 8848, c(0,4000))
       ),
       conditionalPanel(
         
         condition = "input.filterCountry == true",
         htmlOutput("countrySel")
+        #checkboxGroupInput("countryRB", "", choices=1)
       )
       
     ),
