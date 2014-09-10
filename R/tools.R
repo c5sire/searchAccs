@@ -95,7 +95,7 @@ makeQuery <- function(terms="*", from=0, step=10, oper="AND",
     j = 0
     if(!is.null(cntr)){
       j = j+1
-      z[[j]] = termsAsList(cntry, "country")    
+      z[[j]] = termsAsList(cntr, "country")    
     }
     
     if(!is.na(elev[1])){
